@@ -594,22 +594,23 @@ class ADGroup:
 
         """
 
-        entry_list = self.ldap_connection.extend.standard.paged_search(
-            search_base=self.DESCENDANT_SEARCH['base_dn'],
-            search_filter=self.DESCENDANT_SEARCH['filter_string'],
-            search_scope=self.DESCENDANT_SEARCH['scope'],
-            attributes=self.DESCENDANT_SEARCH['attribute_list'],
-            paged_size=page_size
-        )
+        descendants = []
+        queue = deque()
+        queue.appendleft(self)
+        visited = set()
 
-        return [
-            ADGroup(
-                group_dn=entry["dn"], server_uri=self.server_uri, base_dn=self.base_dn,
-                user_lookup_attr=self.user_lookup_attr, group_lookup_attr=self.group_lookup_attr,
-                attr_list=self.attr_list, bind_dn=self.bind_dn, bind_password=self.bind_password,
-                user_search_base_dn=self.user_search_base_dn, group_search_base_dn=self.user_search_base_dn
-            ) for entry in entry_list if entry["type"] == "searchResEntry"
-        ]
+        while len(queue):
+            node = queue.popleft()
+
+            if node not in visited:
+                children = node.get_children(page_size=page_size)
+                for child in children:
+                    if child not in descendants:
+                        descendants.append(child)
+                        queue.appendleft(child)
+                visited.add(node)
+
+        return descendants
 
     def get_children(self, page_size=500):
         """ Returns a list of this group's children.
@@ -638,24 +639,25 @@ class ADGroup:
             return []
 
         try:
-            entry_list = self.ldap_connection.extend.standard.paged_search(
+            self.ldap_connection.search(
                 search_base=connection_dict['base_dn'],
                 search_filter=connection_dict['filter_string'],
                 search_scope=connection_dict['scope'],
                 attributes=connection_dict['attribute_list'],
                 paged_size=page_size
             )
+            entry_list = self.ldap_connection.entries
         except LDAPInvalidFilterError:
             logger.debug("Invalid Filter!: {filter}".format(filter=connection_dict['filter_string']))
 
             return []
         else:
-            results = [result["dn"] for result in entry_list if result["type"] == "searchResEntry"]
+            results = entry_list
 
             for result in results:
                 children.append(
                     ADGroup(
-                        group_dn=result, server_uri=self.server_uri, base_dn=self.base_dn,
+                        group_dn=result.entry_dn, server_uri=self.server_uri, base_dn=self.base_dn,
                         user_lookup_attr=self.user_lookup_attr, group_lookup_attr=self.group_lookup_attr,
                         attr_list=self.attr_list, bind_dn=self.bind_dn, bind_password=self.bind_password,
                         user_search_base_dn=self.user_search_base_dn,
