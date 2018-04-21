@@ -645,7 +645,7 @@ class ADGroup:
                 search_scope=connection_dict['scope'],
                 attributes=connection_dict['attribute_list'],
                 paged_size=page_size
-            )
+            ).entries
         except LDAPInvalidFilterError:
             logger.debug("Invalid Filter!: {filter}".format(filter=connection_dict['filter_string']))
 
