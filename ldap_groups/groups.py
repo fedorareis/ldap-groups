@@ -612,23 +612,6 @@ class ADGroup:
 
         return descendants
 
-        entry_list = self.ldap_connection.extend.standard.paged_search(
-            search_base=self.DESCENDANT_SEARCH['base_dn'],
-            search_filter=self.DESCENDANT_SEARCH['filter_string'],
-            search_scope=self.DESCENDANT_SEARCH['scope'],
-            attributes=self.DESCENDANT_SEARCH['attribute_list'],
-            paged_size=page_size
-        )
-
-        return [
-            ADGroup(
-                group_dn=entry["dn"], server_uri=self.server_uri, base_dn=self.base_dn,
-                user_lookup_attr=self.user_lookup_attr, group_lookup_attr=self.group_lookup_attr,
-                attr_list=self.attr_list, bind_dn=self.bind_dn, bind_password=self.bind_password,
-                user_search_base_dn=self.user_search_base_dn, group_search_base_dn=self.user_search_base_dn
-            ) for entry in entry_list if entry["type"] == "searchResEntry"
-        ]
-
     def get_children(self, page_size=500):
         """ Returns a list of this group's children.
 
@@ -656,7 +639,7 @@ class ADGroup:
             return []
 
         try:
-            entry_list = self.ldap_connection.extend.standard.paged_search(
+            entry_list = self.ldap_connection.search(
                 search_base=connection_dict['base_dn'],
                 search_filter=connection_dict['filter_string'],
                 search_scope=connection_dict['scope'],
