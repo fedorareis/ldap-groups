@@ -647,7 +647,6 @@ class ADGroup:
                 paged_size=page_size
             )
             entry_list = self.ldap_connection.entries
-            print(entry_list)
         except LDAPInvalidFilterError:
             logger.debug("Invalid Filter!: {filter}".format(filter=connection_dict['filter_string']))
 
