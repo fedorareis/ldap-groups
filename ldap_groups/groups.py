@@ -658,7 +658,7 @@ class ADGroup:
             for result in results:
                 children.append(
                     ADGroup(
-                        group_dn=result._dn(), server_uri=self.server_uri, base_dn=self.base_dn,
+                        group_dn=result.entry_dn, server_uri=self.server_uri, base_dn=self.base_dn,
                         user_lookup_attr=self.user_lookup_attr, group_lookup_attr=self.group_lookup_attr,
                         attr_list=self.attr_list, bind_dn=self.bind_dn, bind_password=self.bind_password,
                         user_search_base_dn=self.user_search_base_dn,
