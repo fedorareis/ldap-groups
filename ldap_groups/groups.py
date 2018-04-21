@@ -652,7 +652,7 @@ class ADGroup:
 
             return []
         else:
-            results = [result["dn"] for result in entry_list if result["type"] == "searchResEntry"]
+            results = entry_list
 
             for result in results:
                 children.append(
