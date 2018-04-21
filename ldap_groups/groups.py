@@ -594,6 +594,24 @@ class ADGroup:
 
         """
 
+        descendants = []
+        queue = deque()
+        queue.appendleft(self)
+        visited = set()
+
+        while len(queue):
+            node = queue.popleft()
+
+            if node not in visited:
+                children = node.get_children()
+                for child in children:
+                    if child not in descendants:
+                        descendants.append(child)
+                        queue.appendleft(child)
+                visited.add(node)
+
+        return descendants
+
         entry_list = self.ldap_connection.extend.standard.paged_search(
             search_base=self.DESCENDANT_SEARCH['base_dn'],
             search_filter=self.DESCENDANT_SEARCH['filter_string'],
