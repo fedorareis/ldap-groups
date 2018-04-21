@@ -654,7 +654,9 @@ class ADGroup:
         else:
             results = entry_list
 
+            from datetime import datetime
             for result in results:
+                a = datetime.now()
                 children.append(
                     ADGroup(
                         group_dn=result.entry_dn, server_uri=self.server_uri, base_dn=self.base_dn,
@@ -664,6 +666,8 @@ class ADGroup:
                         group_search_base_dn=self.user_search_base_dn
                     )
                 )
+                b = datetime.now()
+                print(b-a)
 
             return children
 
