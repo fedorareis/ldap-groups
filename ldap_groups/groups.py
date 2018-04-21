@@ -639,13 +639,14 @@ class ADGroup:
             return []
 
         try:
-            entry_list = self.ldap_connection.search(
+            self.ldap_connection.search(
                 search_base=connection_dict['base_dn'],
                 search_filter=connection_dict['filter_string'],
                 search_scope=connection_dict['scope'],
                 attributes=connection_dict['attribute_list'],
                 paged_size=page_size
-            ).entries
+            )
+            entry_list = ldap_connection.entries
         except LDAPInvalidFilterError:
             logger.debug("Invalid Filter!: {filter}".format(filter=connection_dict['filter_string']))
 
